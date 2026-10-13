@@ -1,0 +1,373 @@
+import React, { useState, useMemo } from 'react';
+import { Search, Filter, ExternalLink, Star, ChevronLeft, ChevronRight, Eye } from 'lucide-react';
+import { Restaurant, FilterState } from '../types';
+
+interface RestaurantTableProps {
+  restaurants: Restaurant[];
+  filters?: FilterState;
+  setFilters?: React.Dispatch<React.SetStateAction<FilterState>>;
+  onSelectRestaurant: (restaurant: Restaurant) => void;
+}
+
+export const RestaurantTable: React.FC<RestaurantTableProps> = React.memo(({
+  restaurants,
+  filters: propFilters,
+  setFilters: propSetFilters,
+  onSelectRestaurant,
+}) => {
+  const [internalFilters, setInternalFilters] = useState<FilterState>({
+    searchQuery: '',
+    areaFilter: '',
+    sentimentFilter: '',
+    cuisineFilter: '',
+    minRating: 0,
+  });
+
+  const filters = propFilters || internalFilters;
+  const setFilters = propSetFilters || setInternalFilters;
+
+  const [currentPage, setCurrentPage] = useState(1);
+  const pageSize = 15;
+
+  // Filter options
+  const areas = useMemo(() => {
+    const set = new Set<string>();
+    restaurants.forEach(r => { if (r.area) set.add(r.area); });
+    return Array.from(set).sort();
+  }, [restaurants]);
+
+  const cuisines = useMemo(() => {
+    const set = new Set<string>();
+    restaurants.forEach(r => { if (r.cuisine_type) set.add(r.cuisine_type); });
+    return Array.from(set).sort();
+  }, [restaurants]);
+
+  // Filtered dataset
+  const filtered = useMemo(() => {
+    return restaurants.filter(r => {
+      // 1. Search Query — searches name, area, cuisine, comment
+      if (filters.searchQuery) {
+        const q = filters.searchQuery.toLowerCase();
+        const matchesName = (r.name || '').toLowerCase().includes(q);
+        const matchesArea = (r.area || '').toLowerCase().includes(q);
+        const matchesCuisine = (r.cuisine_type || '').toLowerCase().includes(q);
+        const matchesComment = (r.customer_comment || '').toLowerCase().includes(q);
+        if (!matchesName && !matchesArea && !matchesCuisine && !matchesComment) return false;
+      }
+
+      // 2. Area Filter
+      if (filters.areaFilter && r.area !== filters.areaFilter) return false;
+
+      // 3. Sentiment Filter
+      if (filters.sentimentFilter && r.sentiment_label !== filters.sentimentFilter) return false;
+
+      // 4. Cuisine Filter
+      if (filters.cuisineFilter && r.cuisine_type !== filters.cuisineFilter) return false;
+
+      // 5. Rating Filter
+      if (filters.minRating > 0 && (Number(r.rating) || 0) < filters.minRating) return false;
+
+      return true;
+    });
+  }, [restaurants, filters]);
+
+  // Pagination
+  const totalPages = Math.ceil(filtered.length / pageSize) || 1;
+  const pageData = useMemo(() => {
+    const start = (currentPage - 1) * pageSize;
+    return filtered.slice(start, start + pageSize);
+  }, [filtered, currentPage]);
+
+  const handlePageChange = (newPage: number) => {
+    if (newPage >= 1 && newPage <= totalPages) {
+      setCurrentPage(newPage);
+    }
+  };
+
+  return (
+    <div className="glass-panel" style={{ margin: '0 20px 24px 20px', padding: '20px' }}>
+      {/* Title & Stats */}
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '12px', marginBottom: '18px' }}>
+        <div>
+          <h2 className="font-heading" style={{ fontSize: '1.25rem', fontWeight: 700, margin: 0 }}>
+            Restaurant Explorer & Sentiment Logs
+          </h2>
+          <p style={{ margin: 0, fontSize: '0.8rem', color: 'var(--text-muted)' }}>
+            Showing {filtered.length.toLocaleString()} matching venues out of {restaurants.length.toLocaleString()} total entries
+          </p>
+        </div>
+      </div>
+
+      {/* Filter Bar */}
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '12px', marginBottom: '18px' }}>
+        {/* Search Input */}
+        <div style={{ position: 'relative', gridColumn: 'span 2' }}>
+          <Search size={16} color="#94a3b8" style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)' }} />
+          <input
+            type="text"
+            placeholder="Search restaurant, dish, comment, or area..."
+            value={filters.searchQuery}
+            onChange={e => {
+              setFilters(prev => ({ ...prev, searchQuery: e.target.value }));
+              setCurrentPage(1);
+            }}
+            style={{
+              width: '100%',
+              background: '#0f172a',
+              color: '#fff',
+              border: '1px solid #334155',
+              padding: '9px 12px 9px 36px',
+              borderRadius: '8px',
+              fontSize: '0.85rem',
+              outline: 'none',
+            }}
+          />
+        </div>
+
+        {/* Area Filter */}
+        <select
+          value={filters.areaFilter}
+          onChange={e => {
+            setFilters(prev => ({ ...prev, areaFilter: e.target.value }));
+            setCurrentPage(1);
+          }}
+          style={{ background: '#0f172a', color: '#fff', border: '1px solid #334155', padding: '9px 12px', borderRadius: '8px', fontSize: '0.85rem', outline: 'none' }}
+        >
+          <option value="">All Areas ({areas.length})</option>
+          {areas.map(a => (
+            <option key={a} value={a}>{a}</option>
+          ))}
+        </select>
+
+        {/* Sentiment Filter */}
+        <select
+          value={filters.sentimentFilter}
+          onChange={e => {
+            setFilters(prev => ({ ...prev, sentimentFilter: e.target.value }));
+            setCurrentPage(1);
+          }}
+          style={{ background: '#0f172a', color: '#fff', border: '1px solid #334155', padding: '9px 12px', borderRadius: '8px', fontSize: '0.85rem', outline: 'none' }}
+        >
+          <option value="">All Sentiments</option>
+          <option value="Positive">Positive (⭐⭐⭐⭐+)</option>
+          <option value="Neutral">Neutral (⭐⭐⭐)</option>
+          <option value="Negative">Negative (&lt;⭐⭐⭐)</option>
+        </select>
+
+        {/* Cuisine Filter */}
+        <select
+          value={filters.cuisineFilter}
+          onChange={e => {
+            setFilters(prev => ({ ...prev, cuisineFilter: e.target.value }));
+            setCurrentPage(1);
+          }}
+          style={{ background: '#0f172a', color: '#fff', border: '1px solid #334155', padding: '9px 12px', borderRadius: '8px', fontSize: '0.85rem', outline: 'none' }}
+        >
+          <option value="">All Cuisines</option>
+          {cuisines.map(c => (
+            <option key={c} value={c}>{c}</option>
+          ))}
+        </select>
+
+        {/* Reset */}
+        <button
+          onClick={() => {
+            setFilters({
+              searchQuery: '',
+              areaFilter: '',
+              sentimentFilter: '',
+              cuisineFilter: '',
+              minRating: 0,
+            });
+            setCurrentPage(1);
+          }}
+          style={{
+            background: 'rgba(255, 255, 255, 0.05)',
+            border: '1px solid #334155',
+            color: 'var(--text-muted)',
+            borderRadius: '8px',
+            fontSize: '0.8rem',
+            cursor: 'pointer',
+          }}
+        >
+          Reset Filters
+        </button>
+      </div>
+
+      {/* Table */}
+      <div style={{ overflowX: 'auto', border: '1px solid rgba(255, 255, 255, 0.06)', borderRadius: '10px' }}>
+        <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.83rem', textAlign: 'left' }}>
+          <thead>
+            <tr style={{ background: 'rgba(15, 23, 42, 0.8)', borderBottom: '1px solid #334155', color: '#94a3b8' }}>
+              <th style={{ padding: '12px 14px' }}>Restaurant Name</th>
+              <th style={{ padding: '12px 14px' }}>Neighborhood</th>
+              <th style={{ padding: '12px 14px' }}>Cuisine</th>
+              <th style={{ padding: '12px 14px' }}>Rating</th>
+              <th style={{ padding: '12px 14px' }}>Sentiment</th>
+              <th style={{ padding: '12px 14px' }}>Aspect Scores</th>
+              <th style={{ padding: '12px 14px' }}>Customer Review Comment</th>
+              <th style={{ padding: '12px 14px', textAlign: 'right' }}>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {pageData.length === 0 ? (
+              <tr>
+                <td colSpan={8} style={{ padding: '36px', textAlign: 'center', color: 'var(--text-muted)' }}>
+                  No restaurants match your filter criteria.
+                </td>
+              </tr>
+            ) : (
+              pageData.map((r, i) => {
+                return (
+                  <tr
+                    key={`${r.restaurant_id}-${i}`}
+                    style={{
+                      borderBottom: '1px solid rgba(255, 255, 255, 0.04)',
+                      background: i % 2 === 0 ? 'transparent' : 'rgba(255, 255, 255, 0.01)',
+                      transition: 'background 0.15s',
+                    }}
+                    onMouseEnter={e => (e.currentTarget.style.background = 'rgba(99, 102, 241, 0.06)')}
+                    onMouseLeave={e => (e.currentTarget.style.background = i % 2 === 0 ? 'transparent' : 'rgba(255, 255, 255, 0.01)')}
+                  >
+                    <td style={{ padding: '12px 14px', fontWeight: 600, color: '#fff' }}>
+                      {r.name}
+                      <div style={{ fontSize: '0.72rem', color: '#64748b', fontWeight: 400 }}>{r.restaurant_id}</div>
+                    </td>
+
+                    <td style={{ padding: '12px 14px' }}>
+                      <span style={{ color: '#cbd5e1', fontSize: '0.85rem' }}>
+                        {r.area}
+                      </span>
+                    </td>
+
+                    <td style={{ padding: '12px 14px', color: 'var(--text-muted)' }}>
+                      {r.cuisine_type || 'Multi-Cuisine'}
+                    </td>
+
+                    <td style={{ padding: '12px 14px' }}>
+                      <span style={{ display: 'inline-flex', alignItems: 'center', gap: '3px', fontWeight: 700, color: '#fbbf24' }}>
+                        <Star size={13} fill="#fbbf24" />
+                        {r.rating || 4.2}
+                      </span>
+                    </td>
+
+                    <td style={{ padding: '12px 14px' }}>
+                      <span className={r.sentiment_label === 'Positive' ? 'badge-pos' : r.sentiment_label === 'Neutral' ? 'badge-neu' : 'badge-neg'}>
+                        {r.sentiment_label}
+                      </span>
+                    </td>
+
+                    <td style={{ padding: '12px 14px' }}>
+                      <div style={{ display: 'flex', gap: '4px', fontSize: '0.72rem' }}>
+                        <span title="Food" style={{ background: '#0f172a', padding: '2px 5px', borderRadius: '4px', color: '#34d399' }}>F:{r.food_rating || 4.5}</span>
+                        <span title="Service" style={{ background: '#0f172a', padding: '2px 5px', borderRadius: '4px', color: '#818cf8' }}>S:{r.service_rating || 4.2}</span>
+                        <span title="Ambience" style={{ background: '#0f172a', padding: '2px 5px', borderRadius: '4px', color: '#fbbf24' }}>A:{r.ambience_rating || 4.3}</span>
+                      </div>
+                    </td>
+
+                    <td style={{ padding: '12px 14px', maxWidth: '320px', color: '#cbd5e1' }}>
+                      <div style={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                        "{r.customer_comment || r.review_text}"
+                      </div>
+                      <div style={{ fontSize: '0.7rem', color: '#64748b' }}>
+                        By {r.reviewer_name || 'Verified Diner'} &bull; {r.review_date || 'Recent'}
+                      </div>
+                    </td>
+
+                    <td style={{ padding: '12px 14px', textAlign: 'right' }}>
+                      <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '6px' }}>
+                        <button
+                          onClick={() => onSelectRestaurant(r)}
+                          title="View Details & XAI"
+                          style={{
+                            background: 'rgba(99, 102, 241, 0.2)',
+                            color: '#818cf8',
+                            border: '1px solid rgba(99, 102, 241, 0.3)',
+                            padding: '5px 8px',
+                            borderRadius: '6px',
+                            cursor: 'pointer',
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '4px',
+                            fontSize: '0.75rem',
+                          }}
+                        >
+                          <Eye size={13} />
+                          <span>Inspect</span>
+                        </button>
+
+                        {r.maps_link && (
+                          <a
+                            href={r.maps_link}
+                            target="_blank"
+                            rel="noreferrer"
+                            title="Open Google Maps"
+                            style={{
+                              background: 'rgba(255, 255, 255, 0.05)',
+                              color: '#94a3b8',
+                              border: '1px solid rgba(255, 255, 255, 0.1)',
+                              padding: '5px 8px',
+                              borderRadius: '6px',
+                              textDecoration: 'none',
+                              display: 'flex',
+                              alignItems: 'center',
+                            }}
+                          >
+                            <ExternalLink size={13} />
+                          </a>
+                        )}
+                      </div>
+                    </td>
+                  </tr>
+                );
+              })
+            )}
+          </tbody>
+        </table>
+      </div>
+
+      {/* Pagination Footer */}
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '16px', fontSize: '0.8rem', color: 'var(--text-muted)' }}>
+        <div>
+          Page {currentPage} of {totalPages} ({filtered.length.toLocaleString()} total venues)
+        </div>
+        <div style={{ display: 'flex', gap: '6px' }}>
+          <button
+            onClick={() => handlePageChange(currentPage - 1)}
+            disabled={currentPage === 1}
+            style={{
+              background: '#0f172a',
+              border: '1px solid #334155',
+              color: currentPage === 1 ? '#475569' : '#fff',
+              padding: '6px 12px',
+              borderRadius: '6px',
+              cursor: currentPage === 1 ? 'not-allowed' : 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '4px',
+            }}
+          >
+            <ChevronLeft size={14} /> Prev
+          </button>
+          <button
+            onClick={() => handlePageChange(currentPage + 1)}
+            disabled={currentPage === totalPages}
+            style={{
+              background: '#0f172a',
+              border: '1px solid #334155',
+              color: currentPage === totalPages ? '#475569' : '#fff',
+              padding: '6px 12px',
+              borderRadius: '6px',
+              cursor: currentPage === totalPages ? 'not-allowed' : 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '4px',
+            }}
+          >
+            Next <ChevronRight size={14} />
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+});
