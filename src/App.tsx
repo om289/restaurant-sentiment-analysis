@@ -14,7 +14,7 @@ import { SkeletonLoader } from './components/SkeletonLoader';
 import { Footer } from './components/Footer';
 import { useTheme } from './hooks/useTheme';
 import { Restaurant } from './types';
-import { AlertCircle, AlertTriangle } from 'lucide-react';
+import { AlertCircle, AlertTriangle, ArrowUpRight, MapPin } from 'lucide-react';
 
 // Code split heavy views with dynamic imports for faster initial render
 const InteractiveMap = lazy(() => import('./components/InteractiveMap').then(m => ({ default: m.InteractiveMap })));
@@ -99,7 +99,7 @@ export const App: React.FC = () => {
   const isGeminiKeyMissing = !import.meta.env.VITE_GEMINI_API_KEY;
 
   return (
-    <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
+    <div className="app-shell" style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
       {/* Toast Notifications */}
       <Toaster
         position="top-right"
@@ -142,7 +142,7 @@ export const App: React.FC = () => {
 
       {/* Gemini API Key Missing Banner */}
       {isGeminiKeyMissing && (
-        <div style={{
+        <div className="api-key-banner" style={{
           backgroundColor: 'rgba(251, 191, 36, 0.12)',
           borderBottom: '1px solid rgba(251, 191, 36, 0.3)',
           padding: '12px 20px',
@@ -178,6 +178,21 @@ export const App: React.FC = () => {
 
         {!loading && !error && (
           <>
+            <div className="dashboard-content">
+            {activeTab === 'overview' && (
+              <section className="dashboard-hero" aria-labelledby="dashboard-title">
+                <div className="dashboard-hero-copy">
+                  <span className="dashboard-eyebrow"><MapPin size={14} /> MUMBAI · RESTAURANT INTELLIGENCE</span>
+                  <h2 id="dashboard-title">A clearer view of how the city eats.</h2>
+                  <p>Explore restaurant ratings, guest sentiment and neighborhood trends across Mumbai.</p>
+                </div>
+                <button className="hero-action" type="button" onClick={() => setActiveTab('map')}>
+                  Explore the map <ArrowUpRight size={16} />
+                </button>
+                <div className="hero-orbit hero-orbit-one" />
+                <div className="hero-orbit hero-orbit-two" />
+              </section>
+            )}
             {/* Global Filter Bar (available on dashboard & data tabs) */}
             {activeTab !== 'search' && activeTab !== 'gemini' && (
               <AdvancedFilters
@@ -326,6 +341,7 @@ export const App: React.FC = () => {
                 />
               </motion.div>
             )}
+            </div>
           </>
         )}
       </main>

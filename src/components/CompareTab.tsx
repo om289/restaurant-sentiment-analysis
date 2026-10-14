@@ -69,7 +69,7 @@ export const CompareTab: React.FC<CompareTabProps> = ({ restaurants, onSelectRes
   return (
     <div style={{ margin: '0 20px 24px 20px' }}>
       {/* Header */}
-      <div className="glass-panel" style={{ padding: '20px', marginBottom: '20px' }}>
+      <div className="glass-panel" style={{ padding: '20px', marginBottom: '20px', position: 'relative', zIndex: suggestions.length > 0 ? 50 : 1 }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '14px' }}>
           <div style={{ background: 'linear-gradient(135deg, #6366f1, #ec4899)', width: '42px', height: '42px', borderRadius: '12px', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 4px 14px rgba(99,102,241,0.4)' }}>
             <GitCompareArrows size={22} color="#fff" />
@@ -95,14 +95,14 @@ export const CompareTab: React.FC<CompareTabProps> = ({ restaurants, onSelectRes
               onChange={e => setSearchTerm(e.target.value)}
               disabled={selected.length >= 3}
               style={{
-                width: '100%', background: '#0f172a', color: '#fff', border: '1px solid #334155',
+                width: '100%', background: 'var(--bg-field)', color: 'var(--text-main)', border: '1px solid var(--border-color)',
                 padding: '10px 12px 10px 36px', borderRadius: '8px', fontSize: '0.85rem', outline: 'none',
                 opacity: selected.length >= 3 ? 0.5 : 1,
               }}
             />
 
             {suggestions.length > 0 && (
-              <div style={{ position: 'absolute', top: '105%', left: 0, right: 0, background: '#1e293b', border: '1px solid #334155', borderRadius: '10px', overflow: 'hidden', zIndex: 300, boxShadow: '0 12px 30px rgba(0,0,0,0.6)' }}>
+              <div style={{ position: 'absolute', top: '105%', left: 0, right: 0, background: 'var(--bg-card)', border: '1px solid var(--border-color)', borderRadius: '10px', overflow: 'hidden', zIndex: 300, boxShadow: '0 12px 30px rgba(0,0,0,0.25)' }}>
                 {suggestions.map(r => (
                   <div
                     key={r.restaurant_id}
@@ -112,7 +112,7 @@ export const CompareTab: React.FC<CompareTabProps> = ({ restaurants, onSelectRes
                     onMouseLeave={e => (e.currentTarget.style.background = 'transparent')}
                   >
                     <div>
-                      <strong style={{ color: '#fff', fontSize: '0.85rem' }}>{r.name}</strong>
+                    <strong style={{ color: 'var(--text-main)', fontSize: '0.85rem' }}>{r.name}</strong>
                       <span style={{ fontSize: '0.73rem', color: 'var(--text-muted)', marginLeft: '8px' }}>{r.area} · {r.cuisine_type}</span>
                     </div>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
@@ -149,7 +149,7 @@ export const CompareTab: React.FC<CompareTabProps> = ({ restaurants, onSelectRes
       {/* Empty State */}
       {selected.length === 0 && (
         <div className="glass-panel" style={{ padding: '60px 20px', textAlign: 'center' }}>
-          <GitCompareArrows size={48} color="#334155" style={{ marginBottom: '16px' }} />
+          <GitCompareArrows size={48} color="var(--text-muted)" style={{ marginBottom: '16px' }} />
           <h3 className="font-heading" style={{ fontSize: '1.1rem', fontWeight: 600, color: 'var(--text-muted)', marginBottom: '8px' }}>
             Select Restaurants to Compare
           </h3>
@@ -170,9 +170,9 @@ export const CompareTab: React.FC<CompareTabProps> = ({ restaurants, onSelectRes
             <div style={{ width: '100%', height: '320px' }}>
               <ResponsiveContainer>
                 <RadarChart data={radarData} cx="50%" cy="50%" outerRadius="70%">
-                  <PolarGrid stroke="#334155" />
-                  <PolarAngleAxis dataKey="metric" tick={{ fill: '#94a3b8', fontSize: 12 }} />
-                  <PolarRadiusAxis angle={90} domain={[0, 5]} tick={{ fill: '#64748b', fontSize: 10 }} />
+            <PolarGrid stroke="var(--chart-grid)" />
+                  <PolarAngleAxis dataKey="metric" tick={{ fill: 'var(--text-muted)', fontSize: 12 }} />
+                  <PolarRadiusAxis angle={90} domain={[0, 5]} tick={{ fill: 'var(--text-muted)', fontSize: 10 }} />
                   {selected.map((_, i) => (
                     <Radar
                       key={i}
@@ -185,7 +185,7 @@ export const CompareTab: React.FC<CompareTabProps> = ({ restaurants, onSelectRes
                     />
                   ))}
                   <RechartsTooltip
-                    contentStyle={{ background: '#1e293b', border: '1px solid #334155', borderRadius: '8px', color: '#fff' }}
+                    contentStyle={{ background: 'var(--bg-card)', border: '1px solid var(--border-color)', borderRadius: '8px', color: 'var(--text-main)' }}
                   />
                 </RadarChart>
               </ResponsiveContainer>
@@ -234,7 +234,7 @@ export const CompareTab: React.FC<CompareTabProps> = ({ restaurants, onSelectRes
                     { label: 'Ambience', value: r.ambience_rating || 'N/A', color: '#f472b6' },
                     { label: 'Value', value: r.value_rating || 'N/A', color: '#a855f7' },
                   ].map(m => (
-                    <div key={m.label} style={{ background: 'rgba(0,0,0,0.2)', padding: '8px 4px', borderRadius: '8px' }}>
+                    <div key={m.label} style={{ background: 'var(--bg-hover)', padding: '8px 4px', borderRadius: '8px' }}>
                       <div style={{ fontSize: '0.68rem', color: 'var(--text-muted)', marginBottom: '2px' }}>{m.label}</div>
                       <div style={{ fontSize: '1rem', fontWeight: 700, color: m.color }}>{m.value} ★</div>
                     </div>

@@ -102,7 +102,7 @@ export const SentimentCharts: React.FC<SentimentChartsProps> = React.memo(({ res
                 ))}
               </Pie>
               <RechartsTooltip
-                contentStyle={{ background: '#1e293b', border: '1px solid #334155', borderRadius: '8px', color: '#fff' }}
+                contentStyle={{ background: 'var(--bg-card)', border: '1px solid var(--border-color)', borderRadius: '8px', color: 'var(--text-main)' }}
                 formatter={(val: number) => [`${val.toLocaleString()} reviews (${((val / restaurants.length) * 100).toFixed(1)}%)`, 'Count']}
               />
             </PieChart>
@@ -114,7 +114,7 @@ export const SentimentCharts: React.FC<SentimentChartsProps> = React.memo(({ res
             <div key={p.name} style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '0.8rem' }}>
               <div style={{ width: '10px', height: '10px', borderRadius: '50%', background: p.color }} />
               <span style={{ color: 'var(--text-muted)' }}>{p.name}:</span>
-              <strong style={{ color: '#fff' }}>{((p.value / restaurants.length) * 100).toFixed(1)}%</strong>
+              <strong style={{ color: 'var(--text-main)' }}>{((p.value / restaurants.length) * 100).toFixed(1)}%</strong>
             </div>
           ))}
         </div>
@@ -132,11 +132,11 @@ export const SentimentCharts: React.FC<SentimentChartsProps> = React.memo(({ res
         <div style={{ width: '100%', height: '220px' }}>
           <ResponsiveContainer>
             <BarChart data={aspectData} margin={{ top: 10, right: 10, left: -20, bottom: 20 }}>
-              <CartesianGrid strokeDasharray="3 3" stroke="#334155" opacity={0.5} />
-              <XAxis dataKey="aspect" stroke="#94a3b8" fontSize={11} interval={0} angle={-10} textAnchor="end" />
-              <YAxis stroke="#94a3b8" fontSize={11} domain={[0, 5]} />
+              <CartesianGrid strokeDasharray="3 3" stroke="var(--chart-grid)" opacity={0.5} />
+              <XAxis dataKey="aspect" stroke="var(--text-muted)" fontSize={11} interval={0} angle={-10} textAnchor="end" />
+              <YAxis stroke="var(--text-muted)" fontSize={11} domain={[0, 5]} />
               <RechartsTooltip
-                contentStyle={{ background: '#1e293b', border: '1px solid #334155', borderRadius: '8px', color: '#fff' }}
+                contentStyle={{ background: 'var(--bg-card)', border: '1px solid var(--border-color)', borderRadius: '8px', color: 'var(--text-main)' }}
                 formatter={(val: number) => [`${val} ★`, 'Avg Score']}
               />
               <Bar dataKey="score" fill="#6366f1" radius={[6, 6, 0, 0]} />
@@ -161,10 +161,10 @@ export const SentimentCharts: React.FC<SentimentChartsProps> = React.memo(({ res
         <div style={{ width: '100%', height: '220px' }}>
           <ResponsiveContainer>
             <BarChart data={topCuisinesData} margin={{ top: 10, right: 10, left: -20, bottom: 20 }}>
-              <CartesianGrid strokeDasharray="3 3" stroke="#334155" opacity={0.5} />
-              <XAxis dataKey="cuisine" stroke="#94a3b8" fontSize={11} interval={0} angle={-15} textAnchor="end" />
-              <YAxis stroke="#94a3b8" fontSize={11} />
-              <RechartsTooltip contentStyle={{ background: '#1e293b', border: '1px solid #334155', borderRadius: '8px', color: '#fff' }} />
+              <CartesianGrid strokeDasharray="3 3" stroke="var(--chart-grid)" opacity={0.5} />
+              <XAxis dataKey="cuisine" stroke="var(--text-muted)" fontSize={11} interval={0} angle={-15} textAnchor="end" />
+              <YAxis stroke="var(--text-muted)" fontSize={11} />
+              <RechartsTooltip contentStyle={{ background: 'var(--bg-card)', border: '1px solid var(--border-color)', borderRadius: '8px', color: 'var(--text-main)' }} />
               <Legend wrapperStyle={{ fontSize: '0.75rem', paddingTop: '10px' }} />
               <Bar dataKey="Positive" stackId="a" fill={COLORS.Positive} radius={[0, 0, 0, 0]} />
               <Bar dataKey="Neutral" stackId="a" fill={COLORS.Neutral} radius={[0, 0, 0, 0]} />

@@ -40,16 +40,21 @@ export const Navbar: React.FC<NavbarProps> = ({
 
   return (
     <motion.header
-      className="glass-panel"
+      className="glass-panel app-header"
       style={{
-        margin: '16px 20px',
-        padding: '14px 20px',
+        margin: '12px auto 20px',
+        width: 'calc(100% - 40px)',
+        maxWidth: '1440px',
+        padding: '12px 18px',
         display: 'flex',
         flexWrap: 'wrap',
         alignItems: 'center',
         justifyContent: 'space-between',
         gap: '14px',
-        position: 'relative'
+        position: 'sticky',
+        top: '12px',
+        zIndex: 1100,
+        boxShadow: '0 12px 36px rgba(2, 6, 23, 0.18)',
       }}
       initial={{ opacity: 0, y: -20 }}
       animate={{ opacity: 1, y: 0 }}
@@ -103,10 +108,10 @@ export const Navbar: React.FC<NavbarProps> = ({
       </div>
 
       {/* Desktop Tabs */}
-      <nav style={{
+      <nav className="desktop-navigation" aria-label="Main navigation" style={{
         display: 'flex',
         flexWrap: 'wrap',
-        background: 'rgba(15, 23, 42, 0.4)',
+        background: 'var(--nav-bg)',
         padding: '4px',
         borderRadius: '10px',
         border: '1px solid var(--border-color)',
@@ -116,6 +121,7 @@ export const Navbar: React.FC<NavbarProps> = ({
           <motion.button
             key={tab.id}
             onClick={() => handleTabClick(tab.id)}
+            aria-current={activeTab === tab.id ? 'page' : undefined}
             style={{
               background: activeTab === tab.id ? 'var(--accent-primary)' : 'transparent',
               color: activeTab === tab.id ? '#ffffff' : 'var(--text-muted)',
@@ -195,6 +201,8 @@ export const Navbar: React.FC<NavbarProps> = ({
         <button
           onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
           aria-label="Toggle navigation menu"
+          aria-expanded={mobileMenuOpen}
+          aria-controls="mobile-navigation"
           style={{
             display: 'none',
             background: 'transparent',
@@ -213,7 +221,10 @@ export const Navbar: React.FC<NavbarProps> = ({
       {/* Mobile Menu Dropdown */}
       <AnimatePresence>
         {mobileMenuOpen && (
-          <motion.div
+          <motion.nav
+            className="mobile-navigation"
+            id="mobile-navigation"
+            aria-label="Main navigation"
             style={{
               width: '100%',
               display: 'flex',
@@ -231,6 +242,7 @@ export const Navbar: React.FC<NavbarProps> = ({
               <motion.button
                 key={tab.id}
                 onClick={() => handleTabClick(tab.id)}
+                aria-current={activeTab === tab.id ? 'page' : undefined}
                 style={{
                   background: activeTab === tab.id ? 'var(--accent-primary)' : 'rgba(255, 255, 255, 0.04)',
                   color: activeTab === tab.id ? '#ffffff' : 'var(--text-main)',
@@ -248,7 +260,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                 {tab.label}
               </motion.button>
             ))}
-          </motion.div>
+          </motion.nav>
         )}
       </AnimatePresence>
     </motion.header>

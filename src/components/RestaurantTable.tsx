@@ -182,9 +182,9 @@ export const RestaurantTable: React.FC<RestaurantTableProps> = React.memo(({
             }}
             style={{
               width: '100%',
-              background: '#0f172a',
-              color: '#fff',
-              border: '1px solid #334155',
+              background: 'var(--bg-field)',
+              color: 'var(--text-main)',
+              border: '1px solid var(--border-color)',
               padding: '9px 12px 9px 36px',
               borderRadius: '8px',
               fontSize: '0.85rem',
@@ -200,7 +200,7 @@ export const RestaurantTable: React.FC<RestaurantTableProps> = React.memo(({
             setFilters(prev => ({ ...prev, areaFilter: e.target.value }));
             setCurrentPage(1);
           }}
-          style={{ background: '#0f172a', color: '#fff', border: '1px solid #334155', padding: '9px 12px', borderRadius: '8px', fontSize: '0.85rem', outline: 'none' }}
+          style={{ background: 'var(--bg-field)', color: 'var(--text-main)', border: '1px solid var(--border-color)', padding: '9px 12px', borderRadius: '8px', fontSize: '0.85rem', outline: 'none' }}
         >
           <option value="">All Areas ({areas.length})</option>
           {areas.map(a => (
@@ -215,7 +215,7 @@ export const RestaurantTable: React.FC<RestaurantTableProps> = React.memo(({
             setFilters(prev => ({ ...prev, sentimentFilter: e.target.value }));
             setCurrentPage(1);
           }}
-          style={{ background: '#0f172a', color: '#fff', border: '1px solid #334155', padding: '9px 12px', borderRadius: '8px', fontSize: '0.85rem', outline: 'none' }}
+          style={{ background: 'var(--bg-field)', color: 'var(--text-main)', border: '1px solid var(--border-color)', padding: '9px 12px', borderRadius: '8px', fontSize: '0.85rem', outline: 'none' }}
         >
           <option value="">All Sentiments</option>
           <option value="Positive">Positive (⭐⭐⭐⭐+)</option>
@@ -230,7 +230,7 @@ export const RestaurantTable: React.FC<RestaurantTableProps> = React.memo(({
             setFilters(prev => ({ ...prev, cuisineFilter: e.target.value }));
             setCurrentPage(1);
           }}
-          style={{ background: '#0f172a', color: '#fff', border: '1px solid #334155', padding: '9px 12px', borderRadius: '8px', fontSize: '0.85rem', outline: 'none' }}
+          style={{ background: 'var(--bg-field)', color: 'var(--text-main)', border: '1px solid var(--border-color)', padding: '9px 12px', borderRadius: '8px', fontSize: '0.85rem', outline: 'none' }}
         >
           <option value="">All Cuisines</option>
           {cuisines.map(c => (
@@ -267,7 +267,7 @@ export const RestaurantTable: React.FC<RestaurantTableProps> = React.memo(({
       <div style={{ overflowX: 'auto', border: '1px solid rgba(255, 255, 255, 0.06)', borderRadius: '10px' }}>
         <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.83rem', textAlign: 'left' }}>
           <thead>
-            <tr style={{ background: 'rgba(15, 23, 42, 0.8)', borderBottom: '1px solid #334155', color: '#94a3b8' }}>
+            <tr style={{ background: 'var(--bg-table-head)', borderBottom: '1px solid var(--border-color)', color: 'var(--text-muted)' }}>
               <th style={{ padding: '12px 14px' }}>
                 <button
                   onClick={() => handleSort('name')}
@@ -387,13 +387,13 @@ export const RestaurantTable: React.FC<RestaurantTableProps> = React.memo(({
                       transition: { duration: 0.15 }
                     }}
                   >
-                    <td style={{ padding: '12px 14px', fontWeight: 600, color: '#fff' }}>
+                    <td style={{ padding: '12px 14px', fontWeight: 600, color: 'var(--text-main)' }}>
                       {r.name}
                       <div style={{ fontSize: '0.72rem', color: '#64748b', fontWeight: 400 }}>{r.restaurant_id}</div>
                     </td>
 
                     <td style={{ padding: '12px 14px' }}>
-                      <span style={{ color: '#cbd5e1', fontSize: '0.85rem' }}>
+                      <span style={{ color: 'var(--text-secondary)', fontSize: '0.85rem' }}>
                         {r.area}
                       </span>
                     </td>
@@ -417,13 +417,13 @@ export const RestaurantTable: React.FC<RestaurantTableProps> = React.memo(({
 
                     <td style={{ padding: '12px 14px' }}>
                       <div style={{ display: 'flex', gap: '4px', fontSize: '0.72rem' }}>
-                        <span title="Food" style={{ background: '#0f172a', padding: '2px 5px', borderRadius: '4px', color: '#34d399' }}>F:{r.food_rating || 4.5}</span>
-                        <span title="Service" style={{ background: '#0f172a', padding: '2px 5px', borderRadius: '4px', color: '#818cf8' }}>S:{r.service_rating || 4.2}</span>
-                        <span title="Ambience" style={{ background: '#0f172a', padding: '2px 5px', borderRadius: '4px', color: '#fbbf24' }}>A:{r.ambience_rating || 4.3}</span>
+                        <span title="Food" style={{ background: 'var(--bg-inset)', padding: '2px 5px', borderRadius: '4px', color: '#047857' }}>F:{r.food_rating || 4.5}</span>
+                        <span title="Service" style={{ background: 'var(--bg-inset)', padding: '2px 5px', borderRadius: '4px', color: 'var(--accent-primary)' }}>S:{r.service_rating || 4.2}</span>
+                        <span title="Ambience" style={{ background: 'var(--bg-inset)', padding: '2px 5px', borderRadius: '4px', color: '#b45309' }}>A:{r.ambience_rating || 4.3}</span>
                       </div>
                     </td>
 
-                    <td style={{ padding: '12px 14px', maxWidth: '320px', color: '#cbd5e1' }}>
+                    <td style={{ padding: '12px 14px', maxWidth: '320px', color: 'var(--text-secondary)' }}>
                       <div style={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
                         "{r.customer_comment || r.review_text}"
                       </div>
@@ -494,9 +494,9 @@ export const RestaurantTable: React.FC<RestaurantTableProps> = React.memo(({
             onClick={() => handlePageChange(currentPage - 1)}
             disabled={currentPage === 1}
             style={{
-              background: '#0f172a',
-              border: '1px solid #334155',
-              color: currentPage === 1 ? '#475569' : '#fff',
+              background: 'var(--bg-field)',
+              border: '1px solid var(--border-color)',
+              color: currentPage === 1 ? 'var(--text-muted)' : 'var(--text-main)',
               padding: '6px 12px',
               borderRadius: '6px',
               cursor: currentPage === 1 ? 'not-allowed' : 'pointer',
@@ -511,9 +511,9 @@ export const RestaurantTable: React.FC<RestaurantTableProps> = React.memo(({
             onClick={() => handlePageChange(currentPage + 1)}
             disabled={currentPage === totalPages}
             style={{
-              background: '#0f172a',
-              border: '1px solid #334155',
-              color: currentPage === totalPages ? '#475569' : '#fff',
+              background: 'var(--bg-field)',
+              border: '1px solid var(--border-color)',
+              color: currentPage === totalPages ? 'var(--text-muted)' : 'var(--text-main)',
               padding: '6px 12px',
               borderRadius: '6px',
               cursor: currentPage === totalPages ? 'not-allowed' : 'pointer',
