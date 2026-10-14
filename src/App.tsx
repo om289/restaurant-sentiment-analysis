@@ -1,4 +1,6 @@
 import React, { useState, useEffect, useMemo, lazy, Suspense } from 'react';
+import { motion } from 'framer-motion';
+import { Toaster } from 'react-hot-toast';
 import Papa from 'papaparse';
 import { Navbar } from './components/Navbar';
 import { KPICards } from './components/KPICards';
@@ -98,6 +100,36 @@ export const App: React.FC = () => {
 
   return (
     <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
+      {/* Toast Notifications */}
+      <Toaster
+        position="top-right"
+        toastOptions={{
+          duration: 3000,
+          style: {
+            background: theme === 'dark' ? '#1e293b' : '#ffffff',
+            color: theme === 'dark' ? '#f8fafc' : '#0f172a',
+            border: `1px solid ${theme === 'dark' ? '#334155' : '#e2e8f0'}`,
+            borderRadius: '12px',
+            padding: '12px 16px',
+            fontSize: '0.875rem',
+            fontWeight: 500,
+            boxShadow: '0 10px 25px -5px rgba(0, 0, 0, 0.3)',
+          },
+          success: {
+            iconTheme: {
+              primary: '#10b981',
+              secondary: '#ffffff',
+            },
+          },
+          error: {
+            iconTheme: {
+              primary: '#ef4444',
+              secondary: '#ffffff',
+            },
+          },
+        }}
+      />
+
       {/* Top Navbar */}
       <Navbar
         totalCount={restaurants.length}
@@ -163,7 +195,14 @@ export const App: React.FC = () => {
 
             {/* Tab 1: Dashboard Overview */}
             {activeTab === 'overview' && (
-              <div className="animate-fade-in" style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
+              <motion.div
+                key="overview"
+                initial={{ opacity: 0, x: -20 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: 20 }}
+                transition={{ duration: 0.3 }}
+                style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}
+              >
                 <TrendingInsights
                   restaurants={filteredRestaurants}
                   onSelectRestaurant={handleSelectRestaurant}
@@ -179,36 +218,54 @@ export const App: React.FC = () => {
                   restaurants={filteredRestaurants}
                   onSelectRestaurant={handleSelectRestaurant}
                 />
-              </div>
+              </motion.div>
             )}
 
             {/* Tab 2: Compare Tab */}
             {activeTab === 'compare' && (
-              <div className="animate-fade-in">
+              <motion.div
+                key="compare"
+                initial={{ opacity: 0, x: -20 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: 20 }}
+                transition={{ duration: 0.3 }}
+              >
                 <Suspense fallback={<SkeletonLoader variant="chart" count={2} />}>
                   <CompareTab
                     restaurants={restaurants}
                     onSelectRestaurant={handleSelectRestaurant}
                   />
                 </Suspense>
-              </div>
+              </motion.div>
             )}
 
             {/* Tab 3: Interactive Geospatial Map */}
             {activeTab === 'map' && (
-              <div className="animate-fade-in">
+              <motion.div
+                key="map"
+                initial={{ opacity: 0, x: -20 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: 20 }}
+                transition={{ duration: 0.3 }}
+              >
                 <Suspense fallback={<SkeletonLoader variant="map" />}>
                   <InteractiveMap
                     restaurants={filteredRestaurants}
                     onSelectRestaurant={handleSelectRestaurant}
                   />
                 </Suspense>
-              </div>
+              </motion.div>
             )}
 
             {/* Tab 4: XAI Explainability (SHAP / LIME) */}
             {activeTab === 'xai' && (
-              <div className="animate-fade-in">
+              <motion.div
+                key="xai"
+                initial={{ opacity: 0, x: -20 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: 20 }}
+                transition={{ duration: 0.3 }}
+              >
                 <Suspense fallback={<SkeletonLoader variant="chart" />}>
                   <XAIPanel
                     restaurants={filteredRestaurants}
@@ -216,21 +273,33 @@ export const App: React.FC = () => {
                     onSelectRestaurant={handleSelectRestaurant}
                   />
                 </Suspense>
-              </div>
+              </motion.div>
             )}
 
             {/* Tab 5: Gemini AI Copilot */}
             {activeTab === 'gemini' && (
-              <div className="animate-fade-in">
+              <motion.div
+                key="gemini"
+                initial={{ opacity: 0, x: -20 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: 20 }}
+                transition={{ duration: 0.3 }}
+              >
                 <Suspense fallback={<SkeletonLoader variant="card" count={3} />}>
                   <GeminiInsightsTab restaurants={restaurants} />
                 </Suspense>
-              </div>
+              </motion.div>
             )}
 
             {/* Tab 6: Dedicated Restaurant XAI & Profile Page */}
             {activeTab === 'search' && (
-              <div className="animate-fade-in">
+              <motion.div
+                key="search"
+                initial={{ opacity: 0, x: -20 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: 20 }}
+                transition={{ duration: 0.3 }}
+              >
                 <Suspense fallback={<SkeletonLoader variant="table" />}>
                   <RestaurantProfileView
                     restaurants={restaurants}
@@ -239,17 +308,23 @@ export const App: React.FC = () => {
                     onBackToDashboard={handleBackToDashboard}
                   />
                 </Suspense>
-              </div>
+              </motion.div>
             )}
 
             {/* Tab 7: Full Data Explorer */}
             {activeTab === 'explorer' && (
-              <div className="animate-fade-in">
+              <motion.div
+                key="explorer"
+                initial={{ opacity: 0, x: -20 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: 20 }}
+                transition={{ duration: 0.3 }}
+              >
                 <RestaurantTable
                   restaurants={filteredRestaurants}
                   onSelectRestaurant={handleSelectRestaurant}
                 />
-              </div>
+              </motion.div>
             )}
           </>
         )}

@@ -1,6 +1,10 @@
 import React, { useState, useMemo } from 'react';
-import { Search, Filter, ExternalLink, Star, ChevronLeft, ChevronRight, Eye } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { Search, Filter, ExternalLink, Star, ChevronLeft, ChevronRight, Eye, ArrowUpDown, ArrowUp, ArrowDown } from 'lucide-react';
 import { Restaurant, FilterState } from '../types';
+
+type SortField = 'name' | 'rating' | 'sentiment' | 'area' | 'cuisine';
+type SortDirection = 'asc' | 'desc' | null;
 
 interface RestaurantTableProps {
   restaurants: Restaurant[];
@@ -27,7 +31,32 @@ export const RestaurantTable: React.FC<RestaurantTableProps> = React.memo(({
   const setFilters = propSetFilters || setInternalFilters;
 
   const [currentPage, setCurrentPage] = useState(1);
+  const [sortField, setSortField] = useState<SortField | null>(null);
+  const [sortDirection, setSortDirection] = useState<SortDirection>(null);
   const pageSize = 15;
+
+  const handleSort = (field: SortField) => {
+    if (sortField === field) {
+      // Cycle through: asc -> desc -> null
+      if (sortDirection === 'asc') {
+        setSortDirection('desc');
+      } else if (sortDirection === 'desc') {
+        setSortDirection(null);
+        setSortField(null);
+      }
+    } else {
+      setSortField(field);
+      setSortDirection('asc');
+    }
+    setCurrentPage(1); // Reset to first page when sorting
+  };
+
+  const getSortIcon = (field: SortField) => {
+    if (sortField !== field) return <ArrowUpDown size={14} style={{ opacity: 0.4 }} />;
+    if (sortDirection === 'asc') return <ArrowUp size={14} />;
+    if (sortDirection === 'desc') return <ArrowDown size={14} />;
+    return <ArrowUpDown size={14} style={{ opacity: 0.4 }} />;
+  };
 
   // Filter options
   const areas = useMemo(() => {
@@ -42,9 +71,9 @@ export const RestaurantTable: React.FC<RestaurantTableProps> = React.memo(({
     return Array.from(set).sort();
   }, [restaurants]);
 
-  // Filtered dataset
+  // Filtered and sorted dataset
   const filtered = useMemo(() => {
-    return restaurants.filter(r => {
+    let result = restaurants.filter(r => {
       // 1. Search Query — searches name, area, cuisine, comment
       if (filters.searchQuery) {
         const q = filters.searchQuery.toLowerCase();
@@ -69,7 +98,47 @@ export const RestaurantTable: React.FC<RestaurantTableProps> = React.memo(({
 
       return true;
     });
-  }, [restaurants, filters]);
+
+    // Apply sorting
+    if (sortField && sortDirection) {
+      result = [...result].sort((a, b) => {
+        let aVal: any;
+        let bVal: any;
+
+        switch (sortField) {
+          case 'name':
+            aVal = (a.name || '').toLowerCase();
+            bVal = (b.name || '').toLowerCase();
+            break;
+          case 'rating':
+            aVal = Number(a.rating) || 0;
+            bVal = Number(b.rating) || 0;
+            break;
+          case 'sentiment':
+            const sentimentOrder = { 'Positive': 3, 'Neutral': 2, 'Negative': 1 };
+            aVal = sentimentOrder[a.sentiment_label as keyof typeof sentimentOrder] || 0;
+            bVal = sentimentOrder[b.sentiment_label as keyof typeof sentimentOrder] || 0;
+            break;
+          case 'area':
+            aVal = (a.area || '').toLowerCase();
+            bVal = (b.area || '').toLowerCase();
+            break;
+          case 'cuisine':
+            aVal = (a.cuisine_type || '').toLowerCase();
+            bVal = (b.cuisine_type || '').toLowerCase();
+            break;
+          default:
+            return 0;
+        }
+
+        if (aVal < bVal) return sortDirection === 'asc' ? -1 : 1;
+        if (aVal > bVal) return sortDirection === 'asc' ? 1 : -1;
+        return 0;
+      });
+    }
+
+    return result;
+  }, [restaurants, filters, sortField, sortDirection]);
 
   // Pagination
   const totalPages = Math.ceil(filtered.length / pageSize) || 1;
@@ -199,11 +268,96 @@ export const RestaurantTable: React.FC<RestaurantTableProps> = React.memo(({
         <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.83rem', textAlign: 'left' }}>
           <thead>
             <tr style={{ background: 'rgba(15, 23, 42, 0.8)', borderBottom: '1px solid #334155', color: '#94a3b8' }}>
-              <th style={{ padding: '12px 14px' }}>Restaurant Name</th>
-              <th style={{ padding: '12px 14px' }}>Neighborhood</th>
-              <th style={{ padding: '12px 14px' }}>Cuisine</th>
-              <th style={{ padding: '12px 14px' }}>Rating</th>
-              <th style={{ padding: '12px 14px' }}>Sentiment</th>
+              <th style={{ padding: '12px 14px' }}>
+                <button
+                  onClick={() => handleSort('name')}
+                  style={{
+                    background: 'none',
+                    border: 'none',
+                    color: 'inherit',
+                    cursor: 'pointer',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '6px',
+                    fontWeight: 600,
+                    fontSize: '0.83rem'
+                  }}
+                >
+                  Restaurant Name {getSortIcon('name')}
+                </button>
+              </th>
+              <th style={{ padding: '12px 14px' }}>
+                <button
+                  onClick={() => handleSort('area')}
+                  style={{
+                    background: 'none',
+                    border: 'none',
+                    color: 'inherit',
+                    cursor: 'pointer',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '6px',
+                    fontWeight: 600,
+                    fontSize: '0.83rem'
+                  }}
+                >
+                  Neighborhood {getSortIcon('area')}
+                </button>
+              </th>
+              <th style={{ padding: '12px 14px' }}>
+                <button
+                  onClick={() => handleSort('cuisine')}
+                  style={{
+                    background: 'none',
+                    border: 'none',
+                    color: 'inherit',
+                    cursor: 'pointer',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '6px',
+                    fontWeight: 600,
+                    fontSize: '0.83rem'
+                  }}
+                >
+                  Cuisine {getSortIcon('cuisine')}
+                </button>
+              </th>
+              <th style={{ padding: '12px 14px' }}>
+                <button
+                  onClick={() => handleSort('rating')}
+                  style={{
+                    background: 'none',
+                    border: 'none',
+                    color: 'inherit',
+                    cursor: 'pointer',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '6px',
+                    fontWeight: 600,
+                    fontSize: '0.83rem'
+                  }}
+                >
+                  Rating {getSortIcon('rating')}
+                </button>
+              </th>
+              <th style={{ padding: '12px 14px' }}>
+                <button
+                  onClick={() => handleSort('sentiment')}
+                  style={{
+                    background: 'none',
+                    border: 'none',
+                    color: 'inherit',
+                    cursor: 'pointer',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '6px',
+                    fontWeight: 600,
+                    fontSize: '0.83rem'
+                  }}
+                >
+                  Sentiment {getSortIcon('sentiment')}
+                </button>
+              </th>
               <th style={{ padding: '12px 14px' }}>Aspect Scores</th>
               <th style={{ padding: '12px 14px' }}>Customer Review Comment</th>
               <th style={{ padding: '12px 14px', textAlign: 'right' }}>Actions</th>
@@ -219,15 +373,19 @@ export const RestaurantTable: React.FC<RestaurantTableProps> = React.memo(({
             ) : (
               pageData.map((r, i) => {
                 return (
-                  <tr
+                  <motion.tr
                     key={`${r.restaurant_id}-${i}`}
                     style={{
                       borderBottom: '1px solid rgba(255, 255, 255, 0.04)',
                       background: i % 2 === 0 ? 'transparent' : 'rgba(255, 255, 255, 0.01)',
-                      transition: 'background 0.15s',
                     }}
-                    onMouseEnter={e => (e.currentTarget.style.background = 'rgba(99, 102, 241, 0.06)')}
-                    onMouseLeave={e => (e.currentTarget.style.background = i % 2 === 0 ? 'transparent' : 'rgba(255, 255, 255, 0.01)')}
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: i * 0.02, duration: 0.2 }}
+                    whileHover={{
+                      background: 'rgba(99, 102, 241, 0.06)',
+                      transition: { duration: 0.15 }
+                    }}
                   >
                     <td style={{ padding: '12px 14px', fontWeight: 600, color: '#fff' }}>
                       {r.name}
@@ -318,7 +476,7 @@ export const RestaurantTable: React.FC<RestaurantTableProps> = React.memo(({
                         )}
                       </div>
                     </td>
-                  </tr>
+                  </motion.tr>
                 );
               })
             )}

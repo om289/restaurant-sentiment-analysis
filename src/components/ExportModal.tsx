@@ -1,4 +1,6 @@
 import React from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import toast from 'react-hot-toast';
 import { X, FileSpreadsheet, FileText, Download, CheckCircle2, ShieldCheck, Database } from 'lucide-react';
 import { Restaurant } from '../types';
 import { ExportPanel } from './ExportPanel';
@@ -18,19 +20,40 @@ export const ExportModal: React.FC<ExportModalProps> = ({
 }) => {
   if (!isOpen) return null;
 
+  const handleCSVDownload = () => {
+    toast.success('CSV export started! Downloading now...', {
+      duration: 3000,
+      icon: '📊',
+    });
+    // The actual download link will handle the download
+  };
+
   return (
-    <div className="modal-backdrop" onClick={onClose}>
-      <div
-        className="glass-panel animate-fade-in"
-        onClick={(e) => e.stopPropagation()}
-        style={{
-          width: '100%',
-          maxWidth: '560px',
-          padding: '28px',
-          position: 'relative',
-          boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.5)',
-        }}
-      >
+    <AnimatePresence>
+      {isOpen && (
+        <motion.div
+          className="modal-backdrop"
+          onClick={onClose}
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: 0.2 }}
+        >
+          <motion.div
+            className="glass-panel"
+            onClick={(e) => e.stopPropagation()}
+            style={{
+              width: '100%',
+              maxWidth: '560px',
+              padding: '28px',
+              position: 'relative',
+              boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.5)',
+            }}
+            initial={{ opacity: 0, scale: 0.95, y: 20 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            exit={{ opacity: 0, scale: 0.95, y: 20 }}
+            transition={{ duration: 0.25, ease: 'easeOut' }}
+          >
         {/* Close Button */}
         <button
           onClick={onClose}
@@ -122,7 +145,9 @@ export const ExportModal: React.FC<ExportModalProps> = ({
           <ShieldCheck size={16} color="#10b981" />
           <span>Client-side generation &bull; No third-party data tracking &bull; Instant download</span>
         </div>
-      </div>
-    </div>
+          </motion.div>
+        </motion.div>
+      )}
+    </AnimatePresence>
   );
 };

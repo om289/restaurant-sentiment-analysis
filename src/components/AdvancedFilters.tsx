@@ -1,4 +1,5 @@
 import React from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { Filter, X, RotateCcw, Search, Star, DollarSign, MessageSquare } from 'lucide-react';
 import { Restaurant } from '../types';
 
@@ -152,14 +153,23 @@ export const AdvancedFilters: React.FC<AdvancedFiltersProps> = ({
       </div>
 
       {/* Expanded Filter Drawer */}
-      {isOpen && (
-        <div className="glass-panel animate-fade-in" style={{
-          marginTop: '12px',
-          padding: '24px',
-          display: 'grid',
-          gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))',
-          gap: '20px'
-        }}>
+      <AnimatePresence>
+        {isOpen && (
+          <motion.div
+            className="glass-panel"
+            style={{
+              marginTop: '12px',
+              padding: '24px',
+              display: 'grid',
+              gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))',
+              gap: '20px',
+              overflow: 'hidden'
+            }}
+            initial={{ opacity: 0, height: 0, marginTop: 0 }}
+            animate={{ opacity: 1, height: 'auto', marginTop: '12px' }}
+            exit={{ opacity: 0, height: 0, marginTop: 0 }}
+            transition={{ duration: 0.3, ease: 'easeInOut' }}
+          >
           {/* 1. Search Query */}
           <div>
             <label style={{ display: 'block', fontSize: '0.78rem', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.04em', color: 'var(--text-muted)', marginBottom: '8px' }}>
@@ -349,8 +359,9 @@ export const AdvancedFilters: React.FC<AdvancedFiltersProps> = ({
               <span>1,000+</span>
             </div>
           </div>
-        </div>
-      )}
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 };

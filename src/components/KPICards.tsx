@@ -1,7 +1,9 @@
 import React from 'react';
+import { motion } from 'framer-motion';
 import { Store, ThumbsUp, Star, MapPin, MessageSquare, LucideIcon } from 'lucide-react';
 import { Restaurant } from '../types';
 import { useAnimatedCounter } from '../hooks/useAnimatedCounter';
+import { animations } from '../styles/theme';
 
 interface KPICardsProps {
   restaurants: Restaurant[];
@@ -43,14 +45,28 @@ const KPICardItem: React.FC<CardItemProps> = ({
   }
 
   return (
-    <div className="glass-card" style={{ padding: '20px', display: 'flex', flexDirection: 'column', gap: '12px' }}>
+    <motion.div
+      className="glass-card"
+      style={{ padding: '20px', display: 'flex', flexDirection: 'column', gap: '12px' }}
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      whileHover={{
+        y: -4,
+        boxShadow: '0 12px 30px -5px rgba(0, 0, 0, 0.3), 0 0 20px rgba(99, 102, 241, 0.15)',
+        transition: { duration: 0.25 }
+      }}
+    >
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
         <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.04em' }}>
           {label}
         </span>
-        <div style={{ width: '36px', height: '36px', borderRadius: '10px', background: bg, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+        <motion.div
+          style={{ width: '36px', height: '36px', borderRadius: '10px', background: bg, display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+          whileHover={{ scale: 1.1, rotate: 5 }}
+          transition={{ duration: 0.2 }}
+        >
           <Icon size={18} color={color} />
-        </div>
+        </motion.div>
       </div>
       <div>
         <div className="font-heading" style={{ fontSize: '1.75rem', fontWeight: 700, color: 'var(--text-main)', lineHeight: 1.1 }}>
@@ -60,7 +76,7 @@ const KPICardItem: React.FC<CardItemProps> = ({
           {subtext}
         </div>
       </div>
-    </div>
+    </motion.div>
   );
 };
 
@@ -78,7 +94,12 @@ export const KPICards: React.FC<KPICardsProps> = ({ restaurants }) => {
   const totalReviews = restaurants.reduce((acc, r) => acc + (Number(r.total_reviews) || 0), 0);
 
   return (
-    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(210px, 1fr))', gap: '16px', margin: '0 20px 24px 20px' }}>
+    <motion.div
+      style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(210px, 1fr))', gap: '16px', margin: '0 20px 24px 20px' }}
+      variants={animations.staggerContainer}
+      initial="initial"
+      animate="animate"
+    >
       <KPICardItem
         label="Total Restaurants"
         targetValue={total}
@@ -124,7 +145,7 @@ export const KPICards: React.FC<KPICardsProps> = ({ restaurants }) => {
         color="#ec4899"
         bg="rgba(236, 72, 153, 0.12)"
       />
-    </div>
+    </motion.div>
   );
 };
 
